@@ -3,25 +3,22 @@ import { Link } from "react-router-dom";
 function Movies() {
     const [movies, setMovies] = useState([]);
     useEffect(() => {
-        let moviesList = [
-            {
-                id: 1,
-                title: "Highlander",
-                release_date: "1986-03-07",
-                runtime: 116,
-                mpaa_tating: "R",
-                description: "Some long description",
-            },
-            {
-                id: 2,
-                title: "Raiders of the Lost Ark",
-                release_date: "1981-06-12",
-                runtime: 115,
-                mpaa_tating: "PG-13",
-                description: "Some long description",
-            },
-        ];
-        setMovies(moviesList);
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+
+        const requestOptions = {
+            method: "GET",
+            headers: headers,
+        }
+
+        fetch(`http://localhost:9000/movies`,requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                setMovies(data);
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }, []);
     return (
 
