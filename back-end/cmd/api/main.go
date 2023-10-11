@@ -12,9 +12,13 @@ import (
 const port = 9000
 
 type application struct {
-	DSN    string
-	Domain string
-	DB     repository.DatabaseRepo
+	DSN          string
+	Domain       string
+	DB           repository.DatabaseRepo
+	auth         Auth
+	JWTSecret    string
+	JWTAudience  string
+	CookieDomain string
 }
 
 func main() {
@@ -22,6 +26,7 @@ func main() {
 	var app application
 	//read from command line
 	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 user=postgres password=postgres dbname=movies sslmode=disable timezone=UTC connect_timeout=5", "Postgress connection string")
+	flag.StringVar(&app.JWTSecret, "jwt-secret", "verysecret", "string secret")
 	flag.Parse()
 	//connect to the database
 	conn, err := app.connectToDB()
@@ -31,7 +36,7 @@ func main() {
 	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
 	defer app.DB.Connection().Close()
 	//start a web server
-	app.Domain = "example.com"
+
 	log.Println("Starting application on port", port)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), app.routes())
